@@ -1,4 +1,4 @@
-(ns practice-concurrent.core
+(ns concurrent.core
   ;; note: no imports needed for java.util.Concurrent
   ; (:import [java.io File]
   ;          [java.util Date Stack]
