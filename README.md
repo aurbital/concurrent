@@ -1,6 +1,6 @@
 # concurrent
 
-FIXME: description
+Runs multiple threads for concurrent operations. 
 
 ## Installation
 
