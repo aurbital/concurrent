@@ -29,41 +29,32 @@
 
 
 ; create an agent that keeps track of its position in a map using :x and :y
-(defn create-ant
-  "returns an agent that is represented as a position, which in turn is represented as a map with :x and :y"
+(defn create-traveler
+  "returns an agent that is represented as an instantaneous position, which in turn is represented as a map with :x and :y"
   []
   (agent {:x 0 :y 0}))
 
 (defn randomstep
-  "This is the update function to be sent to ant (agent).\n Input: position as represented by a map\n Output: position as represented by a map"
+  "This is the update function to be sent to traveller (agent).\n Input: position as represented by a map\n Output: position as represented by a map"
   [{xpos :x ypos :y}]
   (letfn [(rand1 []
                  "random integer between -1 and +1, inclusive"
                  (+ (rand-int 3) -1))]
     {:x (+ xpos (rand1)) :y (+ ypos (rand1))}))
 
-; (randomstep {:x 0 :y 0})
-; (def ant (create-ant))
-; (let [ant (create-ant)]
-;   (send ant randomstep))
 
-(defn ant-walk
-  "Ant agent walk n steps"
+(defn traveler-wander
+  "Traveler random-walks n steps"
   [n]
-  (let [ant (create-ant)]
+  (let [traveler (create-traveler)]
     (loop [counter n]
       (when (pos? counter)
         (do
-          (send ant randomstep)
+          (send traveler randomstep)
           ; (println (str "counter: " counter))
           (recur (dec counter)))))
-    (print ant)))
+    (print traveler)))
 
-
-
-        ; (send ant randomstep)
-
-; (ant-walk 100)
 
 
 
@@ -76,10 +67,11 @@
   ;(.start (Thread. (fn [] (pl-n 100))))
 
 
-  (.start (Thread. (fn [] (ant-walk 50))))
-  (.start (Thread. (fn [] (ant-walk 50))))
-  (.start (Thread. (fn [] (ant-walk 50))))
-  (.start (Thread. (fn [] (ant-walk 50))))
-  (.start (Thread. (fn [] (ant-walk 50)))))
+  (.start (Thread. (fn [] (traveler-wander 50))))
+  (.start (Thread. (fn [] (traveler-wander 50))))
+  (.start (Thread. (fn [] (traveler-wander 50))))
+  (.start (Thread. (fn [] (traveler-wander 50))))
+  (.start (Thread. (fn [] (traveler-wander 50)))))
+
 
 ; (-main)
