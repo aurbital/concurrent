@@ -45,7 +45,6 @@
  ([x y]
   {:path (agent [[x y]])}))
 
-
 (defn pos
   "function: pos \n semantics: returns the current position of a traveler \n representation: the position is represented as a vector [x y] inside :path which is a vector of vectors ([[xt yt] [x(t-1) y(t-1)] [x(t-2) y(t-2)] ...]) wrapped inside an agent"
   [traveler]
@@ -70,7 +69,12 @@
         ynew (+ (rand1) y)]
     (send (:path traveler) (fn [v] (cons [xnew ynew] v)))))
 
+; ;; conj or cons?
+; (def aa [[0 0]])
+; (print (conj (conj aa [1 1]) [2 2])) ; --> [[0 0] [1 1] [2 2]]
+; (print (cons [2 2] (cons [1 1] aa))) ; --> ([2 2] [1 1] [0 0])
 (defn randwalk
+  "loops through randstep for a total of n times"
   [traveler n]
   (loop [counter n]
     (when (pos? counter)
@@ -82,93 +86,17 @@
 (let [t (create-traveler)]
   (randwalk t 10))
 
-
-(let [t (create-traveler [0 0])]
- (println (str "path: " @(:path t)))
- (println (str "current position: " (pos t)))
- (println (str "current x: " (xpos t)))
- (println (str "current y: " (ypos t)))
- (randstep t)
- (randstep t)
- (randstep t)
- t)
-
-
-
-
-
-
-
-
-
-
-
-; the following "methods" are abstractions that hide the implementation details of traveler
-; this is where OOP would have come in handy -- you know immediately which functions are "methods" specific to which "class", as opposed to possibly believing these functions are "free-for-all"
-
-(defn current-pos
-  "returns the current (x,y) position of the traveler"
-  [traveler]
-  (first (:path traveler)))
-
-(defn current-xpos
-  "returns the current x-position of the traveler"
-  [traveler]
-  (xpos (current-position traveler)))
-
-(defn current-ypos
-  "returns the current x-position of the traveler"
-  [traveler]
-  (ypos (current-position traveler)))
-
-(defn xpos
-  "returns x-position of a position vector"
-  [pos]
-  (first pos))
-
-(defn ypos
-  "returns y-position of a position vector"
-  [pos]
-  (last pos))
+; (let [t (create-traveler [0 0])]
+;  (println (str "path: " @(:path t)))
+;  (println (str "current position: " (pos t)))
+;  (println (str "current x: " (xpos t)))
+;  (println (str "current y: " (ypos t)))
+;  (randstep t)
+;  (randstep t)
+;  (randstep t)
+;  t)
 
 ;;; --------------------------------------
-
-
-; ;; conj or cons?
-; (def aa [[0 0]])
-; (print (conj (conj aa [1 1]) [2 2])) ; returns vector
-; (print (cons [2 2] (cons [1 1] aa))) ; returns sequence
-
-(defn randstep
-  [traveler])
-
-
-
-(defn wander
-  "Traveler random-walks n steps"
-  [traveler n]
-  (loop [counter n
-         t traveler]
-    (if (not (pos? counter))
-      t
-      (recur (dec counter)
-        (cons [(+ (rand1) (current-xpos t))
-               (+ (rand1) (current-ypos t))]
-              path)))))
-
-
-
-
-
-
-
-
-
-
-
-(traveler-wander 1)
-
-
 
 
 (defn -main
@@ -177,13 +105,10 @@
 
   ;(.start (Thread. pl100))
   ;(.start (Thread. (fn [] (pl-n 100))))
+  (let [rw (fn []
+             (let [t (create-traveler)]
+              (randwalk t 100)))]
+    (rw)))
 
 
-  (.start (Thread. (fn [] (traveler-wander 50))))
-  (.start (Thread. (fn [] (traveler-wander 50))))
-  (.start (Thread. (fn [] (traveler-wander 50))))
-  (.start (Thread. (fn [] (traveler-wander 50))))
-  (.start (Thread. (fn [] (traveler-wander 50)))))
-
-
-; (-main)
+(-main)
