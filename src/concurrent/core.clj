@@ -37,36 +37,27 @@
 ;;; --------------------------------------
 ;;; traveler "class" and associated "methods"
 
-; (defn create-traveler
-;   "function: create-traveler \n semantics: returns a newly-instantiated traveling entity \n representation: a dcc (data-code-compound) data structure"
-;  ([]
-;   {:path (agent [[0 0]])})
-;  ([[x y]]
-;   {:path (agent [[x y]])})
-;  ([x y]
-;   {:path (agent [[x y]])}))
-
 (def traveler-id
   "running global variable of traveler ids"
   (ref 0))
 
+(defn validpos?
+  "function: validpos? \n semantics: checks whether a value is a valid data structure to represent a position \n representation: returns true if arg is a vector of two integers (i.e. [int int]), false if otherwise"
+  [arg]
+  (and (vector? arg)
+       (= (count arg) 2)
+       (every? int? arg)))
+
 (defn create-traveler
   "function: create-traveler \n semantics: returns a newly-instantiated traveling entity \n representation: a dcc (data-code-compound) data structure"
- ([]
-  {:path (agent [[0 0]])})
- ([[x y]]
-  {:path (agent [[x y]])})
- ([x y]
-  {:path (agent [[x y]])}))
+ ([& args]
+  (let [id (dosync
+             (alter traveler-id inc))
+        init (if (validpos? (first args)) ; discards (cdr args)
+                 (first args)
+                 [0 0])]
+    {:id id :path (agent [init])})))
 
-; (defn create-traveler
-;   "function: create-traveler \n semantics: returns a newly-instantiated traveling entity \n representation: a dcc (data-code-compound) data structure"
-;  ([]
-;   {:path (agent [[0 0]])})
-;  ([[x y]]
-;   {:path (agent [[x y]])})
-;  ([x y]
-;   {:path (agent [[x y]])}))
 
 (defn pos
   "function: pos \n semantics: returns the current position of a traveler \n representation: the position is represented as a vector [x y] inside :path which is a vector of vectors ([[xt yt] [x(t-1) y(t-1)] [x(t-2) y(t-2)] ...]) wrapped inside an agent"
@@ -90,12 +81,9 @@
         y (ypos traveler)
         xnew (+ (rand1) x)
         ynew (+ (rand1) y)]
-    (send (:path traveler) (fn [v] (cons [xnew ynew] v)))))
+    (send (:path traveler) (fn [v] (conj v [xnew ynew])))))
 
-; ;; conj or cons?
-; (def aa [[0 0]])
-; (print (conj (conj aa [1 1]) [2 2])) ; --> [[0 0] [1 1] [2 2]]
-; (print (cons [2 2] (cons [1 1] aa))) ; --> ([2 2] [1 1] [0 0])
+
 (defn randwalk
   "loops through randstep for a total of n times"
   [traveler n]
@@ -103,12 +91,13 @@
     (when (pos? counter)
       (do
         (randstep traveler)
+        (println (str "traveler " (:id traveler)" step #" (- n counter)))
         (recur (dec counter)))))
   traveler)
 
 (let [t (create-traveler)]
-  (randwalk t 10))
-  ;(type t))
+ (randwalk t 10))
+    ;(type t))
 
 ; (let [t (create-traveler [0 0])]
 ;  (println (str "path: " @(:path t)))
@@ -122,6 +111,11 @@
 
 ;;; --------------------------------------
 
+;;; ------ random test code for fun ------
+
+;;; --------------------------------------
+
+
 
 (defn -main
   "Experiment to test code for concurrent processes"
@@ -129,10 +123,14 @@
 
   ;(.start (Thread. pl100))
   ;(.start (Thread. (fn [] (pl-n 100))))
-  (let [rw (fn []
-             (let [t (create-traveler)]
-              (randwalk t 100)))]
-    (rw)))
+
+  (.start (Thread. (fn [] (randwalk (create-traveler) 100))))
+  (.start (Thread. (fn [] (randwalk (create-traveler) 100))))
+  (.start (Thread. (fn [] (randwalk (create-traveler) 100))))
+  (.start (Thread. (fn [] (randwalk (create-traveler) 100))))
+  (.start (Thread. (fn [] (randwalk (create-traveler) 100)))))
+
+
 
 
 (-main)
