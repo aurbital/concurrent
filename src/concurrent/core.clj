@@ -4,28 +4,29 @@
   ;          [java.util Date Stack]
   ;          [java.net Proxy URI])
   ;;          [java.util.concurrent])
+  (:require [clojure.java.io :as io])
   (:gen-class))
 
 ; function p100 is used for testing concurrent operations that don't have return values
 ; pl100 == "print loop 100"
 ; wanted a function that is guaranteed to end s.t. thread does not go into infinite loop
-(defn pl100 []
-  "Prints from 100 to 1"
-  (loop [counter 100]
-    (when (pos? counter)
-      (do
-        (Thread/sleep 100)
-        (println (str "counter: " counter))
-        (recur (dec counter))))))
-
-(defn pl-n [n]
-    "Prints from n to 1"
-    (loop [counter n]
-      (when (pos? counter)
-        (do
-          (Thread/sleep 100)
-          (println (str "counter: " counter))
-          (recur (dec counter))))))
+; (defn pl100 []
+;   "Prints from 100 to 1"
+;   (loop [counter 100]
+;     (when (pos? counter)
+;       (do
+;         (Thread/sleep 100)
+;         (println (str "counter: " counter))
+;         (recur (dec counter))))))
+;
+; (defn pl-n [n]
+;     "Prints from n to 1"
+;     (loop [counter n]
+;       (when (pos? counter)
+;         (do
+;           (Thread/sleep 100)
+;           (println (str "counter: " counter))
+;           (recur (dec counter))))))
 
 
 (defn rand1
@@ -36,6 +37,19 @@
 ;;; --------------------------------------
 ;;; traveler "class" and associated "methods"
 
+; (defn create-traveler
+;   "function: create-traveler \n semantics: returns a newly-instantiated traveling entity \n representation: a dcc (data-code-compound) data structure"
+;  ([]
+;   {:path (agent [[0 0]])})
+;  ([[x y]]
+;   {:path (agent [[x y]])})
+;  ([x y]
+;   {:path (agent [[x y]])}))
+
+(def traveler-id
+  "running global variable of traveler ids"
+  (ref 0))
+
 (defn create-traveler
   "function: create-traveler \n semantics: returns a newly-instantiated traveling entity \n representation: a dcc (data-code-compound) data structure"
  ([]
@@ -44,6 +58,15 @@
   {:path (agent [[x y]])})
  ([x y]
   {:path (agent [[x y]])}))
+
+; (defn create-traveler
+;   "function: create-traveler \n semantics: returns a newly-instantiated traveling entity \n representation: a dcc (data-code-compound) data structure"
+;  ([]
+;   {:path (agent [[0 0]])})
+;  ([[x y]]
+;   {:path (agent [[x y]])})
+;  ([x y]
+;   {:path (agent [[x y]])}))
 
 (defn pos
   "function: pos \n semantics: returns the current position of a traveler \n representation: the position is represented as a vector [x y] inside :path which is a vector of vectors ([[xt yt] [x(t-1) y(t-1)] [x(t-2) y(t-2)] ...]) wrapped inside an agent"
@@ -85,6 +108,7 @@
 
 (let [t (create-traveler)]
   (randwalk t 10))
+  ;(type t))
 
 ; (let [t (create-traveler [0 0])]
 ;  (println (str "path: " @(:path t)))
